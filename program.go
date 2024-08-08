@@ -6,21 +6,31 @@ import (
 	"syscall"
 )
 
+type Signal chan os.Signal
+
+func NewSignal() Signal {
+	return make(chan os.Signal, 1)
+}
+
+func (s Signal) Finish() {
+	close(s)
+}
+
 type Program interface {
-	AddSignal(chs ...chan os.Signal)
+	AddSignal(chs ...Signal)
 	Run() os.Signal
 }
 
 type _Program struct {
-	chs []chan os.Signal
+	chs []Signal
 }
 
-func (s *_Program) AddSignal(chs ...chan os.Signal) {
+func (s *_Program) AddSignal(chs ...Signal) {
 	s.chs = append(s.chs, chs...)
 }
 
 func (s *_Program) Run() os.Signal {
-	ch := make(chan os.Signal, 1)
+	ch := NewSignal()
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 
 	LogInfo("program running")
@@ -40,5 +50,5 @@ func (s *_Program) Run() os.Signal {
 }
 
 func NewProgram() Program {
-	return &_Program{chs: []chan os.Signal{}}
+	return &_Program{chs: []Signal{}}
 }
