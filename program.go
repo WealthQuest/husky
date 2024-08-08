@@ -3,52 +3,76 @@ package husky
 import (
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 )
 
-type Signal chan os.Signal
+type Signal chan struct{}
 
 func NewSignal() Signal {
-	return make(chan os.Signal, 1)
+	return make(chan struct{}, 1)
 }
 
 func (s Signal) Finish() {
 	close(s)
 }
 
-type Program interface {
-	AddSignal(chs ...Signal)
-	Run() os.Signal
+var programIns ProgramAPI
+
+func InitProgram() {
+	programIns = &_Program{
+		Mutex:   sync.Mutex{},
+		signals: make([]Signal, 0),
+		stopCh:  make(chan struct{}),
+	}
+}
+
+func Program() ProgramAPI {
+	return programIns
+}
+
+type ProgramAPI interface {
+	AddSignal(s Signal)
+	Run()
+	Stop()
 }
 
 type _Program struct {
-	chs []Signal
+	sync.Mutex
+	signals []Signal
+	stopCh  chan struct{}
 }
 
-func (s *_Program) AddSignal(chs ...Signal) {
-	s.chs = append(s.chs, chs...)
+func (p *_Program) AddSignal(s Signal) {
+	p.Lock()
+	defer p.Unlock()
+	p.signals = append(p.signals, s)
 }
 
-func (s *_Program) Run() os.Signal {
-	ch := NewSignal()
+func (s *_Program) Run() {
+	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 
-	LogInfo("program running")
-	sign := <-ch
-	LogWarn("program stop signal:", sign)
-
-	for index := range s.chs {
-		ch := s.chs[index]
-		ch <- sign
+	LogInfo("程序运行中")
+	select {
+	case sign := <-ch:
+		LogWarn("收到系统停止信号:", sign)
+	case <-s.stopCh:
+		LogWarn("收到程序停止信号")
 	}
-	for index := range s.chs {
-		ch := s.chs[index]
+
+	for index := range s.signals {
+		ch := s.signals[index]
+		ch <- struct{}{}
+	}
+	for index := range s.signals {
+		ch := s.signals[index]
 		<-ch
 	}
-	LogInfo("program stoped")
-	return sign
+	LogInfo("程序已停止")
+
 }
 
-func NewProgram() Program {
-	return &_Program{chs: []Signal{}}
+func (s *_Program) Stop() {
+	close(s.stopCh)
 }
