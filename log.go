@@ -117,43 +117,43 @@ func InitLog(config *LogConfig) {
 	logIns = &_Log{ins: l}
 }
 
-func LogDebug(args ...interface{}) {
+func Debug(args ...interface{}) {
 	logIns.Skip(1).Debug(args...)
 }
 
-func LogInfo(args ...interface{}) {
+func Info(args ...interface{}) {
 	logIns.Skip(1).Info(args...)
 }
 
-func LogWarn(args ...interface{}) {
+func Warn(args ...interface{}) {
 	logIns.Skip(1).Warn(args...)
 }
 
-func LogError(args ...interface{}) {
+func Error(args ...interface{}) {
 	logIns.Skip(1).Error(args...)
 }
 
-func LogPanic(args ...interface{}) {
+func Panic(args ...interface{}) {
 	logIns.Skip(1).Panic(args...)
 }
 
-func LogDebugf(format string, args ...interface{}) {
+func Debugf(format string, args ...interface{}) {
 	logIns.Skip(1).Debugf(format, args...)
 }
 
-func LogInfof(format string, args ...interface{}) {
+func Infof(format string, args ...interface{}) {
 	logIns.Skip(1).Infof(format, args...)
 }
 
-func LogWarnf(format string, args ...interface{}) {
+func Warnf(format string, args ...interface{}) {
 	logIns.Skip(1).Warnf(format, args...)
 }
 
-func LogErrorf(format string, args ...interface{}) {
+func Errorf(format string, args ...interface{}) {
 	logIns.Skip(1).Errorf(format, args...)
 }
 
-func LogPanicf(format string, args ...interface{}) {
+func Panicf(format string, args ...interface{}) {
 	logIns.Skip(1).Panicf(format, args...)
 }
 

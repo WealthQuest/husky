@@ -53,12 +53,12 @@ func (s *_Program) Run() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 
-	LogInfo("程序运行中")
+	Info("程序运行中")
 	select {
 	case sign := <-ch:
-		LogWarn("收到系统停止信号:", sign)
+		Warn("收到系统停止信号:", sign)
 	case <-s.stopCh:
-		LogWarn("收到程序停止信号")
+		Warn("收到程序停止信号")
 	}
 
 	for index := range s.signals {
@@ -69,7 +69,7 @@ func (s *_Program) Run() {
 		ch := s.signals[index]
 		<-ch
 	}
-	LogInfo("程序已停止")
+	Info("程序已停止")
 
 }
 

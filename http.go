@@ -142,12 +142,12 @@ func HttpCall[R any](opts ...HttpOptions) (*R, error) {
 		config.ResponseCallback(response, body)
 	}
 	if config.ShowLog {
-		LogInfo("--------------------[HEADER]--------------------")
+		Info("--------------------[HEADER]--------------------")
 		for key := range response.Header {
-			LogInfo(key, ":", response.Header.Get(key))
+			Info(key, ":", response.Header.Get(key))
 		}
-		LogInfo("--------------------[ BODY ]--------------------")
-		LogInfo(string(body))
+		Info("--------------------[ BODY ]--------------------")
+		Info(string(body))
 	}
 
 	var r R
