@@ -2,36 +2,24 @@ package husky
 
 import (
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/snowflake"
 	uuid "github.com/satori/go.uuid"
+	"golang.org/x/exp/rand"
 )
 
 type UUID interface {
-	Id() int64
-	Uuid() string
-	TimeID() string
+	Gen() int64
 }
 
 type _UUID struct {
 	ins *snowflake.Node
 }
 
-func (u *_UUID) Id() int64 {
+func (u *_UUID) Gen() int64 {
 	return u.ins.Generate().Int64()
-}
-
-func (u *_UUID) Uuid() string {
-	return strings.ReplaceAll(uuid.NewV4().String(), "-", "")
-}
-
-func (u *_UUID) TimeID() string {
-	now := time.Now().Format("20060102150405")
-	n := rand.Int63n(1000000000000000000)
-	return fmt.Sprintf("%s%018d", now, n)
 }
 
 var uuidIns map[string]UUID
@@ -62,4 +50,14 @@ func Uuid(key ...string) UUID {
 	} else {
 		return uuidIns[key[0]]
 	}
+}
+
+func UuidStr() string {
+	return strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+}
+
+func UuidTime() string {
+	now := time.Now().Format("20060102150405")
+	n := rand.Int63n(1000000000000000000)
+	return fmt.Sprintf("%s%018d", now, n)
 }
