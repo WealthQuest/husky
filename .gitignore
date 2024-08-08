@@ -1,0 +1,15 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+.vscode
+.idea
+logs
+.DS_Store
+*.iml
+.fleet/
+__debug_*
+tests/
