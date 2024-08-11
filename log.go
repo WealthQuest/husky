@@ -96,9 +96,8 @@ func InitLog(config *LogConfig) {
 	encoderConfig.CallerKey = "location"
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	// encoderConfig.EncodeCaller = zapcore.FullCallerEncoder
-	if config.Caller {
-		encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
-	}
+	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+
 	if config.Ansi && !config.Json {
 		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	}
@@ -116,6 +115,7 @@ func InitLog(config *LogConfig) {
 		),
 		zap.AddCaller(),
 		zap.AddCallerSkip(1),
+		zap.WithCaller(config.Caller),
 	)
 	logIns = &_Log{ins: l}
 }
