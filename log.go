@@ -27,9 +27,10 @@ type _Log struct {
 }
 
 type LogConfig struct {
-	Level string `toml:"level"`
-	Ansi  bool   `toml:"ansi"`
-	Json  bool   `toml:"json"`
+	Level  string `toml:"level"`
+	Ansi   bool   `toml:"ansi"`
+	Json   bool   `toml:"json"`
+	Caller bool   `toml:"caller"`
 }
 
 func (l *_Log) Debug(args ...interface{}) {
@@ -95,7 +96,9 @@ func InitLog(config *LogConfig) {
 	encoderConfig.CallerKey = "location"
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	// encoderConfig.EncodeCaller = zapcore.FullCallerEncoder
-	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+	if config.Caller {
+		encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+	}
 	if config.Ansi && !config.Json {
 		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	}
